@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "Dti9GwH0bzM=",
+  "success": true,
+  "projectFilePath": "/Users/msamual/projects/iq/IqTestApi/IqTestApi.csproj",
+  "expectedPackageFiles": [
+    "/Users/msamual/.nuget/packages/microsoft.aspnetcore.openapi/9.0.4/microsoft.aspnetcore.openapi.9.0.4.nupkg.sha512",
+    "/Users/msamual/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512"
+  ],
+  "logs": []
+}

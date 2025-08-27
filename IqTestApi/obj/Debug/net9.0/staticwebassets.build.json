@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "E6GkpVvblV74aqLsZnxHFP7Bme4Tmi9L8injkCSVPXY=",
+  "Source": "IqTestApi",
+  "BasePath": "_content/IqTestApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
