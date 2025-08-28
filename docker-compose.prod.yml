@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # .NET API Backend
+  iq-test-api:
+    build:
+      context: ./IqTestApi
+      dockerfile: Dockerfile.prod
+    container_name: iq-test-api-prod
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+    networks:
+      - iq-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Angular Frontend with Nginx
+  iq-test-frontend:
+    build:
+      context: ./iq-test-frontend
+      dockerfile: Dockerfile.prod
+    container_name: iq-test-frontend-prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - iq-test-api
+    networks:
+      - iq-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  iq-network:
+    driver: bridge

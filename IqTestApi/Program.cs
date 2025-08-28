@@ -28,12 +28,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    // Don't redirect to HTTPS in development
 }
-else
-{
-    app.UseHttpsRedirection();
-}
+
+// Don't use HTTPS redirection in production (handled by reverse proxy)
 
 app.UseCors("AllowAngular");
 
