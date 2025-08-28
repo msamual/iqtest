@@ -47,8 +47,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 ### `.github/workflows/deploy.yml`
 - Запускается при push в main
 - Работает на self-hosted runner
-- Собирает образы локально на сервере
-- Развертывает приложение
+- Просто запускает скрипт `deploy.sh`
 
 ## Локальная разработка
 
