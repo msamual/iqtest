@@ -27,6 +27,7 @@ docker image prune -f
 
 # Build and start services
 echo "🔨 Building and starting services..."
+echo "📋 This may take several minutes for the first build..."
 docker-compose -f docker-compose.prod.yml up --build -d
 
 # Wait for services to be ready
