@@ -32,7 +32,7 @@ fi
 
 # Stop existing containers
 echo "🛑 Stopping existing containers..."
-docker-compose -f docker-compose.prod.yml down || true
+docker-compose down || true
 
 # Remove old images to force rebuild
 echo "🗑️ Removing old images..."
@@ -41,7 +41,7 @@ docker image prune -f
 # Build and start services
 echo "🔨 Building and starting services..."
 echo "📋 This may take several minutes for the first build..."
-docker-compose -f docker-compose.prod.yml up --build -d
+docker-compose up --build -d
 
 # Wait for services to be ready
 echo "⏳ Waiting for services to be ready..."
@@ -54,7 +54,7 @@ if curl -k -f https://localhost/api/IqTest/health > /dev/null 2>&1; then
 else
     echo "❌ API is not responding via HTTPS"
     echo "📋 API logs:"
-    docker-compose -f docker-compose.prod.yml logs iq-test-api
+    docker-compose logs iq-test-api
     exit 1
 fi
 
@@ -63,7 +63,7 @@ if curl -k -f https://localhost > /dev/null 2>&1; then
 else
     echo "❌ Frontend is not responding via HTTPS"
     echo "📋 Frontend logs:"
-    docker-compose -f docker-compose.prod.yml logs iq-test-frontend
+    docker-compose logs iq-test-frontend
     exit 1
 fi
 
@@ -73,4 +73,4 @@ echo "🔧 API is available at: https://msamual.ru/api"
 
 # Show running containers
 echo "📊 Running containers:"
-docker-compose -f docker-compose.prod.yml ps
+docker-compose ps
