@@ -45,13 +45,37 @@ sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 ```
 
-### 3. Deploy Application
+### 3. Install Node.js (Optional - for local development)
+```bash
+# Run the Node.js installation script
+./install-nodejs.sh
+
+# Or install manually:
+sudo apt update
+sudo apt install -y curl
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo npm install -g @angular/cli@20
+```
+
+### 4. Deploy Application
+
+#### Option A: Docker-only deployment (Recommended)
 ```bash
 # Clone or upload the project to your server
 # Navigate to project directory
 cd /path/to/iq-test
 
-# Run deployment script
+# Run Docker-only deployment (no Node.js required on host)
+./deploy-docker-only.sh
+```
+
+#### Option B: Full deployment (requires Node.js)
+```bash
+# First install Node.js (see step 3 above)
+./install-nodejs.sh
+
+# Then run full deployment
 ./deploy.sh
 ```
 
