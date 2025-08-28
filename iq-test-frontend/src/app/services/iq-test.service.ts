@@ -47,8 +47,8 @@ export interface CompleteTestRequest {
   providedIn: 'root'
 })
 export class IqTestService {
-  private apiUrl = 'http://localhost:5263/api/IqTest';
-  private baseUrl = 'http://localhost:5263';
+  private apiUrl = '/api/IqTest';
+  private baseUrl = '';
 
   constructor(private http: HttpClient) { }
 
