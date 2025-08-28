@@ -543,8 +543,8 @@ export class TestComponent implements OnInit, OnDestroy {
     this.answers.set(this.currentQuestionIndex, answerIndex);
     this.isAnswered = true;
     
-    // Submit answer
-    if (this.currentQuestion) {
+    // Отправляем ответ на сервер
+    if (this.currentQuestion && this.sessionId) {
       this.iqTestService.submitAnswer({
         sessionId: this.sessionId,
         questionId: this.currentQuestion.id,
@@ -553,18 +553,29 @@ export class TestComponent implements OnInit, OnDestroy {
       }).pipe(
         catchError(error => {
           console.error('Ошибка отправки ответа:', error);
+          // Продолжаем работу даже если отправка не удалась
           return of(null);
         })
-      ).subscribe();
+      ).subscribe({
+        next: (session) => {
+          if (session) {
+            console.log('Ответ отправлен успешно');
+          }
+        }
+      });
     }
   }
 
   autoSubmitAnswer(): void {
-    if (!this.isAnswered && this.selectedAnswer !== null) {
-      this.selectAnswer(this.selectedAnswer);
-    } else if (!this.isAnswered) {
-      // Auto-select first option if no answer selected
-      this.selectAnswer(0);
+    if (!this.isAnswered) {
+      if (this.selectedAnswer !== null) {
+        // Уже есть выбранный ответ, просто отмечаем как отвеченный
+        this.answers.set(this.currentQuestionIndex, this.selectedAnswer);
+        this.isAnswered = true;
+      } else {
+        // Auto-select first option if no answer selected
+        this.selectAnswer(0);
+      }
     }
   }
 
@@ -620,9 +631,7 @@ export class TestComponent implements OnInit, OnDestroy {
     this.iqTestService.completeTest({ sessionId: this.sessionId }).pipe(
       catchError(error => {
         console.error('Ошибка завершения теста:', error);
-        // Создаем фиктивную сессию для демонстрации результатов
-        const mockSession = this.createMockSession();
-        this.router.navigate(['/results'], { state: { session: mockSession } });
+        this.testState = 'error';
         return of(null);
       })
     ).subscribe({
@@ -631,45 +640,14 @@ export class TestComponent implements OnInit, OnDestroy {
           console.log('Тест завершен успешно:', session);
           this.router.navigate(['/results'], { state: { session } });
         } else {
-          console.log('Сессия не найдена, создаем mock сессию');
-          const mockSession = this.createMockSession();
-          this.router.navigate(['/results'], { state: { session: mockSession } });
+          console.error('Не удалось получить результаты теста');
+          this.testState = 'error';
         }
       }
     });
   }
 
-  private createMockSession(): TestSession {
-    const totalQuestions = this.questions.length;
-    let correctAnswers = 0;
-    
-    // Подсчитываем правильные ответы
-    for (const [questionIndex, answerIndex] of this.answers.entries()) {
-      if (this.questions[questionIndex] && answerIndex === this.questions[questionIndex].correctAnswerIndex) {
-        correctAnswers++;
-      }
-    }
-    
-    const percentage = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
-    const iqScore = Math.max(70, Math.min(130, 100 + (percentage - 50) * 2));
 
-    return {
-      id: this.sessionId || 'mock-session',
-      startTime: new Date().toISOString(),
-      endTime: new Date().toISOString(),
-      answers: Array.from(this.answers.entries()).map(([questionIndex, answerIndex]) => ({
-        questionId: this.questions[questionIndex]?.id || questionIndex + 1,
-        selectedAnswerIndex: answerIndex,
-        isCorrect: answerIndex === this.questions[questionIndex]?.correctAnswerIndex,
-        timeSpent: this.questions[questionIndex]?.timeLimit || 60,
-        answeredAt: new Date().toISOString()
-      })),
-      totalScore: correctAnswers,
-      maxPossibleScore: totalQuestions,
-      iqScore: iqScore,
-      isCompleted: true
-    };
-  }
 
   formatTime(seconds: number): string {
     const minutes = Math.floor(seconds / 60);

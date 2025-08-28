@@ -4,7 +4,7 @@ namespace IqTestApi.Services
 {
     public interface IIqTestService
     {
-        List<IqQuestion> GetQuestions(int count = 20);
+        List<IqQuestionForClient> GetQuestions(int count = 20);
         IqQuestion GetQuestionById(int id);
         TestSession CreateTestSession();
         TestSession SubmitAnswer(Guid sessionId, int questionId, int answerIndex, int timeSpent);
@@ -15,18 +15,29 @@ namespace IqTestApi.Services
     public class IqTestService : IIqTestService
     {
         private readonly List<IqQuestion> _questions;
-        private readonly Dictionary<Guid, TestSession> _sessions;
+        private static readonly Dictionary<Guid, TestSession> _sessions = new Dictionary<Guid, TestSession>();
 
         public IqTestService()
         {
             _questions = GenerateSampleQuestions();
-            _sessions = new Dictionary<Guid, TestSession>();
         }
 
-        public List<IqQuestion> GetQuestions(int count = 20)
+        public List<IqQuestionForClient> GetQuestions(int count = 20)
         {
             var random = new Random();
-            return _questions.OrderBy(x => random.Next()).Take(count).ToList();
+            var selectedQuestions = _questions.OrderBy(x => random.Next()).Take(count).ToList();
+            
+            // Убираем correctAnswerIndex из ответа для безопасности
+            return selectedQuestions.Select(q => new IqQuestionForClient
+            {
+                Id = q.Id,
+                QuestionText = q.QuestionText,
+                QuestionImage = q.QuestionImage,
+                Options = q.Options,
+                Explanation = q.Explanation,
+                Difficulty = q.Difficulty,
+                TimeLimit = q.TimeLimit
+            }).ToList();
         }
 
         public IqQuestion GetQuestionById(int id)
@@ -96,9 +107,22 @@ namespace IqTestApi.Services
 
         private double CalculateIqScore(int correctAnswers, int totalQuestions)
         {
-            // Простая формула: базовый IQ 100 + (процент правильных ответов - 50) * 2
+            if (totalQuestions == 0) return 100.0;
+            
+            // Более реалистичная формула IQ
             var percentage = (double)correctAnswers / totalQuestions * 100;
-            return Math.Max(70, Math.Min(130, 100 + (percentage - 50) * 2));
+            
+            // Используем нормальное распределение для IQ
+            // 50% правильных ответов = IQ 100
+            // 100% правильных ответов = IQ 130
+            // 0% правильных ответов = IQ 70
+            var iqScore = 70 + (percentage / 100.0) * 60;
+            
+            // Ограничиваем значения и избегаем NaN/Infinity
+            if (double.IsNaN(iqScore) || double.IsInfinity(iqScore))
+                return 100.0;
+                
+            return Math.Max(70.0, Math.Min(130.0, iqScore));
         }
 
         private List<IqQuestion> GenerateSampleQuestions()
@@ -126,10 +150,10 @@ namespace IqTestApi.Services
                         "Ни одна роза не увядает быстро", 
                         "Нельзя определить" 
                     },
-                    CorrectAnswerIndex = 1,
-                    Explanation = "Логический вывод: если все розы - цветы, а некоторые цветы увядают, то некоторые розы могут увядать",
-                    Difficulty = 3,
-                    TimeLimit = 90
+                    CorrectAnswerIndex = 3,
+                    Explanation = "Из данных посылок нельзя сделать однозначный вывод. Множество роз может не пересекаться с множеством быстро увядающих цветов",
+                    Difficulty = 4,
+                    TimeLimit = 120
                 },
                 new IqQuestion
                 {
@@ -193,8 +217,8 @@ namespace IqTestApi.Services
                         "Ни одна книга не тяжелая", 
                         "Нельзя определить" 
                     },
-                    CorrectAnswerIndex = 1,
-                    Explanation = "Логический вывод: если все книги - предметы, а некоторые предметы тяжелые, то некоторые книги могут быть тяжелыми",
+                    CorrectAnswerIndex = 3,
+                    Explanation = "Из данных посылок нельзя сделать однозначный вывод. Множество книг может не пересекаться с множеством тяжелых предметов",
                     Difficulty = 3,
                     TimeLimit = 90
                 },
@@ -250,9 +274,9 @@ namespace IqTestApi.Services
                         "Нельзя определить" 
                     },
                     CorrectAnswerIndex = 1,
-                    Explanation = "Логический вывод: если некоторые студенты спят, то это утверждение верно",
-                    Difficulty = 2,
-                    TimeLimit = 60
+                    Explanation = "Это тавтология - утверждение 'некоторые студенты спят' уже дано в условии задачи",
+                    Difficulty = 1,
+                    TimeLimit = 30
                 },
                 new IqQuestion
                 {

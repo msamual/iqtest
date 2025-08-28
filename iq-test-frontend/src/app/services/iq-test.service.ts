@@ -8,7 +8,6 @@ export interface IqQuestion {
   questionText: string;
   questionImage: string;
   options: string[];
-  correctAnswerIndex: number;
   explanation: string;
   difficulty: number;
   timeLimit: number;

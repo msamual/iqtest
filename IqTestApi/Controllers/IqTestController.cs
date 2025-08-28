@@ -30,7 +30,7 @@ namespace IqTestApi.Controllers
         }
 
         [HttpGet("questions")]
-        public ActionResult<List<IqQuestion>> GetQuestions([FromQuery] int count = 20)
+        public ActionResult<List<IqQuestionForClient>> GetQuestions([FromQuery] int count = 20)
         {
             try
             {
