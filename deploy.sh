@@ -35,7 +35,7 @@ sleep 30
 
 # Check if services are running
 echo "🔍 Checking service health..."
-if curl -f http://localhost/api/IqTest/questions?count=1 > /dev/null 2>&1; then
+if curl -f http://localhost/api/IqTest/health > /dev/null 2>&1; then
     echo "✅ API is responding"
 else
     echo "❌ API is not responding"

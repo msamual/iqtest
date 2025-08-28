@@ -8,6 +8,11 @@ namespace IqTestApi.Controllers
     [Route("api/[controller]")]
     public class IqTestController : ControllerBase
     {
+        [HttpGet("health")]
+        public IActionResult Health()
+        {
+            return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
+        }
         private readonly IIqTestService _iqTestService;
 
         public IqTestController(IIqTestService iqTestService)
