@@ -502,7 +502,7 @@ export class TestComponent implements OnInit, OnDestroy {
   }
 
   loadQuestions(): void {
-    this.questionsSubscription = this.iqTestService.getQuestions(3).pipe(
+    this.questionsSubscription = this.iqTestService.getQuestions(20).pipe(
       catchError(error => {
         console.error('Ошибка загрузки вопросов:', error);
         this.testState = 'error';
