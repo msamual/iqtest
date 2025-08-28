@@ -1,9 +1,22 @@
 #!/bin/bash
 
-# Docker-only deployment script (no Node.js required on host)
+# HTTPS deployment script
 set -e
 
-echo "🚀 Starting IQ Test deployment (Docker-only)..."
+echo "🔒 Starting HTTPS deployment for msamual.ru..."
+
+# Check if SSL certificates exist
+if [ ! -f "/etc/ssl/certs/msamual.ru.crt" ]; then
+    echo "❌ SSL certificate not found: /etc/ssl/certs/msamual.ru.crt"
+    exit 1
+fi
+
+if [ ! -f "/etc/ssl/certs/Certificate.key" ]; then
+    echo "❌ SSL private key not found: /etc/ssl/certs/Certificate.key"
+    exit 1
+fi
+
+echo "✅ SSL certificates found"
 
 # Check if Docker is installed
 if ! command -v docker &> /dev/null; then
@@ -36,27 +49,27 @@ sleep 60
 
 # Check if services are running
 echo "🔍 Checking service health..."
-if curl -f http://localhost/api/IqTest/health > /dev/null 2>&1; then
-    echo "✅ API is responding"
+if curl -k -f https://localhost/api/IqTest/health > /dev/null 2>&1; then
+    echo "✅ API is responding via HTTPS"
 else
-    echo "❌ API is not responding"
+    echo "❌ API is not responding via HTTPS"
     echo "📋 API logs:"
     docker-compose -f docker-compose.prod.yml logs iq-test-api
     exit 1
 fi
 
-if curl -f http://localhost > /dev/null 2>&1; then
-    echo "✅ Frontend is responding"
+if curl -k -f https://localhost > /dev/null 2>&1; then
+    echo "✅ Frontend is responding via HTTPS"
 else
-    echo "❌ Frontend is not responding"
+    echo "❌ Frontend is not responding via HTTPS"
     echo "📋 Frontend logs:"
     docker-compose -f docker-compose.prod.yml logs iq-test-frontend
     exit 1
 fi
 
-echo "🎉 Deployment completed successfully!"
-echo "📱 Application is available at: http://localhost"
-echo "🔧 API is available at: http://localhost/api"
+echo "🎉 HTTPS deployment completed successfully!"
+echo "🌐 Application is available at: https://msamual.ru"
+echo "🔧 API is available at: https://msamual.ru/api"
 
 # Show running containers
 echo "📊 Running containers:"

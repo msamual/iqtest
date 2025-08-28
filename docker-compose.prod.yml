@@ -28,12 +28,16 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/ssl/certs/msamual.ru.crt:/etc/ssl/certs/msamual.ru.crt:ro
+      - /etc/ssl/certs/Certificate.key:/etc/ssl/certs/Certificate.key:ro
     depends_on:
       - iq-test-api
     networks:
       - iq-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      test: ["CMD", "curl", "-f", "https://localhost"]
       interval: 30s
       timeout: 10s
       retries: 3

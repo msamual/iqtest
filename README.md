@@ -1,161 +1,74 @@
 # IQ Test Application
 
-Веб-приложение для прохождения IQ-теста с фронтендом на Angular и бэкендом на .NET.
+Full-stack IQ test application with Angular frontend and .NET Core API backend, deployed with HTTPS.
 
-## Структура проекта
+## Features
 
-```
-iq/
-├── IqTestApi/          # .NET Web API бэкенд
-│   ├── Controllers/    # API контроллеры
-│   ├── Models/         # Модели данных
-│   ├── Services/       # Бизнес-логика
-│   └── Program.cs      # Точка входа
-└── iq-test-frontend/   # Angular фронтенд
-    ├── src/
-    │   ├── app/
-    │   │   ├── components/  # Компоненты UI
-    │   │   ├── services/    # Сервисы для API
-    │   │   └── app.routes.ts # Маршрутизация
-    │   └── main.ts
-    └── package.json
-```
+- 26 diverse IQ test questions
+- Visual questions with SVG images
+- Server-side answer validation and scoring
+- Responsive design
+- HTTPS deployment with SSL certificates
+- Docker containerization
 
-## Возможности
+## Architecture
 
-- 🧠 20 разнообразных вопросов на логику, математику и пространственное мышление
-- ⏱️ Временные ограничения для каждого вопроса
-- 📊 Детальные результаты с расчетом IQ
-- 🎯 Навигация между вопросами
-- 📱 Адаптивный дизайн для мобильных устройств
-- 🔄 Возможность пройти тест заново
-- 📤 Поделиться результатами в социальных сетях
+- **Frontend**: Angular 20 with TypeScript
+- **Backend**: .NET 9 Web API
+- **Web Server**: Nginx with SSL termination
+- **Containerization**: Docker & Docker Compose
 
-## Технологии
+## Production Deployment
 
-### Бэкенд (.NET)
-- ASP.NET Core Web API
-- C# 12
-- In-memory хранилище данных
-- RESTful API
+### Prerequisites
+- Ubuntu server with Docker and Docker Compose
+- SSL certificates at `/etc/ssl/certs/msamual.ru.crt` and `/etc/ssl/certs/Certificate.key`
 
-### Фронтенд (Angular)
-- Angular 18
-- TypeScript
-- SCSS стили
-- Responsive дизайн
-- Server-Side Rendering (SSR)
-
-## Запуск проекта
-
-### Предварительные требования
-
-- .NET 8 SDK
-- Node.js 18+
-- npm или yarn
-
-### Запуск бэкенда
-
-1. Перейдите в директорию бэкенда:
+### Deploy
 ```bash
+./deploy-https.sh
+```
+
+### Test
+```bash
+./test-https.sh
+```
+
+## Access
+
+- **Application**: https://msamual.ru
+- **API**: https://msamual.ru/api
+
+## Security
+
+- HTTPS with TLS 1.2/1.3
+- HSTS headers
+- CORS properly configured
+- Server-side answer validation
+
+## Development
+
+### Local Development
+```bash
+# Backend
 cd IqTestApi
-```
-
-2. Восстановите зависимости:
-```bash
-dotnet restore
-```
-
-3. Запустите API:
-```bash
 dotnet run
-```
 
-API будет доступен по адресу: `https://localhost:7001`
-
-### Запуск фронтенда
-
-1. Перейдите в директорию фронтенда:
-```bash
+# Frontend
 cd iq-test-frontend
-```
-
-2. Установите зависимости:
-```bash
 npm install
-```
-
-3. Запустите приложение:
-```bash
 npm start
 ```
 
-Фронтенд будет доступен по адресу: `http://localhost:4200`
-
 ## API Endpoints
 
-- `POST /api/IqTest/start` - Начать новый тест
-- `GET /api/IqTest/questions?count=20` - Получить вопросы
-- `GET /api/IqTest/questions/{id}` - Получить конкретный вопрос
-- `POST /api/IqTest/submit-answer` - Отправить ответ
-- `POST /api/IqTest/complete` - Завершить тест
-- `GET /api/IqTest/session/{sessionId}` - Получить сессию теста
+- `POST /api/IqTest/start` - Start new test
+- `GET /api/IqTest/questions?count=26` - Get questions
+- `GET /api/IqTest/questions/{id}` - Get specific question
+- `POST /api/IqTest/submit-answer` - Submit answer
+- `POST /api/IqTest/complete` - Complete test
+- `GET /api/IqTest/health` - Health check
 
-## Структура вопросов
-
-Каждый вопрос содержит:
-- Текст вопроса
-- Опциональное изображение
-- 4 варианта ответа
-- Индекс правильного ответа
-- Объяснение
-- Уровень сложности (1-5)
-- Временное ограничение
-
-## Расчет IQ
-
-IQ рассчитывается по формуле:
-```
-IQ = 100 + (процент правильных ответов - 50) * 2
-```
-
-Диапазон: 70-130
-
-## Разработка
-
-### Добавление новых вопросов
-
-Отредактируйте метод `GenerateSampleQuestions()` в `IqTestService.cs`:
-
-```csharp
-private List<IqQuestion> GenerateSampleQuestions()
-{
-    return new List<IqQuestion>
-    {
-        new IqQuestion
-        {
-            Id = 4,
-            QuestionText = "Ваш новый вопрос",
-            Options = new List<string> { "A", "B", "C", "D" },
-            CorrectAnswerIndex = 0,
-            Explanation = "Объяснение",
-            Difficulty = 3,
-            TimeLimit = 60
-        }
-        // ... другие вопросы
-    };
-}
-```
-
-### Кастомизация UI
-
-Стили компонентов находятся в файлах `.ts` в секции `styles`. Используйте SCSS для более сложных стилей.
-
-## Лицензия
+## License
 
 MIT License
-
-## Поддержка
-
-При возникновении проблем создайте issue в репозитории проекта.
-# iqtest
