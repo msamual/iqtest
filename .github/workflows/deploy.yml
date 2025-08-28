@@ -1,0 +1,37 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy application
+      run: |
+        # Stop existing containers
+        docker-compose down || true
+        
+        # Build and start services
+        docker-compose up --build -d
+        
+        # Cleanup old images
+        docker image prune -f
+        
+        # Wait for services to be ready
+        sleep 30
+        
+        # Test deployment
+        if curl -k -f https://localhost/api/IqTest/health > /dev/null 2>&1; then
+          echo "✅ Deployment successful"
+        else
+          echo "❌ Deployment failed"
+          docker-compose logs
+          exit 1
+        fi

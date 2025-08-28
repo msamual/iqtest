@@ -24,14 +24,19 @@ Full-stack IQ test application with Angular frontend and .NET Core API backend, 
 - Ubuntu server with Docker and Docker Compose
 - SSL certificates at `/etc/ssl/certs/msamual.ru.crt` and `/etc/ssl/certs/Certificate.key`
 
-### Deploy
+### Automated Deployment (GitHub Actions)
+1. Self-hosted runner уже настроен на сервере
+2. Push в main ветку автоматически развернет приложение
+3. Сборка происходит локально на сервере
+
+### Manual Deployment
 ```bash
-./deploy-https.sh
+./deploy.sh
 ```
 
 ### Test
 ```bash
-./test-https.sh
+./test.sh
 ```
 
 ## Access

@@ -1,0 +1,96 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-api:
+    runs-on: self-hosted
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore IqTestApi/IqTestApi.csproj
+
+    - name: Build
+      run: dotnet build IqTestApi/IqTestApi.csproj --no-restore
+
+    - name: Test
+      run: dotnet test IqTestApi/IqTestApi.csproj --no-build --verbosity normal
+
+  test-frontend:
+    runs-on: self-hosted
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: iq-test-frontend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd iq-test-frontend
+        npm ci
+
+    - name: Lint
+      run: |
+        cd iq-test-frontend
+        npm run lint
+
+    - name: Build
+      run: |
+        cd iq-test-frontend
+        npm run build
+
+  docker-build:
+    runs-on: self-hosted
+    needs: [test-api, test-frontend]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build API image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./IqTestApi
+        file: ./IqTestApi/Dockerfile.prod
+        push: false
+        tags: iq-test-api:test
+
+    - name: Build Frontend image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./iq-test-frontend
+        file: ./iq-test-frontend/Dockerfile.prod
+        push: false
+        tags: iq-test-frontend:test
+
+    - name: Test Docker Compose
+      run: |
+        # Create test docker-compose file
+        cp docker-compose.yml docker-compose.test.yml
+        sed -i 's|build:|# build:|g' docker-compose.test.yml
+        sed -i 's|context: .*|image: iq-test-api:test|g' docker-compose.test.yml
+        sed -i 's|dockerfile: .*|# dockerfile: Dockerfile.prod|g' docker-compose.test.yml
+        
+        # Test compose file
+        docker-compose -f docker-compose.test.yml config

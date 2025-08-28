@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# HTTPS deployment script
+# Local deployment script
 set -e
 
-echo "🔒 Starting HTTPS deployment for msamual.ru..."
+echo "🚀 Starting local deployment..."
 
 # Check if SSL certificates exist
 if [ ! -f "/etc/ssl/certs/msamual.ru.crt" ]; then
@@ -67,7 +67,7 @@ else
     exit 1
 fi
 
-echo "🎉 HTTPS deployment completed successfully!"
+echo "🎉 Deployment completed successfully!"
 echo "🌐 Application is available at: https://msamual.ru"
 echo "🔧 API is available at: https://msamual.ru/api"
 
