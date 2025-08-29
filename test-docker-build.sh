@@ -17,6 +17,10 @@ if [ $? -eq 0 ]; then
     echo "🔍 Testing image content..."
     docker run --rm iq-test-api:debug cat /app/wwwroot/images/triangles.svg | head -3 || echo "❌ Cannot read triangles.svg"
     
+    # Check if compressed versions exist
+    echo "🔍 Checking compressed versions..."
+    docker run --rm iq-test-api:debug ls -la /app/wwwroot/images/*.gz || echo "❌ No compressed versions found"
+    
 else
     echo "❌ API image build failed"
     exit 1

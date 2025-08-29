@@ -22,8 +22,8 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Copy static files (images) from build context
-COPY wwwroot/images/ /app/wwwroot/images/
+# Ensure wwwroot directory exists and has correct permissions
+RUN mkdir -p /app/wwwroot/images && chmod -R 755 /app/wwwroot
 
 # Set environment variables for production
 ENV ASPNETCORE_ENVIRONMENT=Production

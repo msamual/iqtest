@@ -1,5 +1,6 @@
 /Users/msamual/projects/iq/IqTestApi/bin/Release/net9.0/appsettings.Development.json
 /Users/msamual/projects/iq/IqTestApi/bin/Release/net9.0/appsettings.json
+/Users/msamual/projects/iq/IqTestApi/bin/Release/net9.0/IqTestApi.staticwebassets.runtime.json
 /Users/msamual/projects/iq/IqTestApi/bin/Release/net9.0/IqTestApi.staticwebassets.endpoints.json
 /Users/msamual/projects/iq/IqTestApi/bin/Release/net9.0/IqTestApi
 /Users/msamual/projects/iq/IqTestApi/bin/Release/net9.0/IqTestApi.deps.json
@@ -15,7 +16,12 @@
 /Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/IqTestApi.csproj.CoreCompileInputs.cache
 /Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/IqTestApi.MvcApplicationPartsAssemblyInfo.cs
 /Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/IqTestApi.MvcApplicationPartsAssemblyInfo.cache
+/Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/IqTestApi.sourcelink.json
 /Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/scopedcss/bundle/IqTestApi.styles.css
+/Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/compressed/bxr0f1v4te-ztjj275dff.gz
+/Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/compressed/ryt83rfpfe-j77i0wfgjp.gz
+/Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/compressed/ozv7la7lvg-ibt2upfmbj.gz
+/Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/compressed/bk5hj6jpet-a8ymofq1pd.gz
 /Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/staticwebassets.build.json
 /Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/staticwebassets.development.json
 /Users/msamual/projects/iq/IqTestApi/obj/Release/net9.0/staticwebassets.build.endpoints.json

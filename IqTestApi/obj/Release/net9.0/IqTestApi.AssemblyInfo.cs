@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("IqTestApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aa6a47ff3262d14e4a7c6290a09c970c09faa6f5")]
 [assembly: System.Reflection.AssemblyProductAttribute("IqTestApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IqTestApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
