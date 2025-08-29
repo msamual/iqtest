@@ -41,8 +41,8 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 ### `.github/workflows/test.yml`
 - Запускается при push в main/develop и при pull requests
-- Тестирует .NET API и Angular frontend
-- Собирает Docker образы для проверки
+- Проверяет корректность docker-compose.yml
+- Тестирует сборку Docker образов
 
 ### `.github/workflows/deploy.yml`
 - Запускается при push в main
