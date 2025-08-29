@@ -42,14 +42,6 @@ app.UseCors("AllowAngular");
 // Serve static files (images)
 app.UseStaticFiles();
 
-// Serve static files from wwwroot with specific path
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
-    RequestPath = "/images"
-});
-
 app.UseAuthorization();
 app.MapControllers();
 
