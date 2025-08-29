@@ -48,7 +48,7 @@ export interface CompleteTestRequest {
 })
 export class IqTestService {
   private apiUrl = '/api/IqTest';
-  private baseUrl = '';
+  private baseUrl = '/api';
 
   constructor(private http: HttpClient) { }
 

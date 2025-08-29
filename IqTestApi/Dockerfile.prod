@@ -22,8 +22,9 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Create wwwroot directory for static files
+# Create wwwroot directory for static files and copy images
 RUN mkdir -p /app/wwwroot/images
+COPY wwwroot/images/ /app/wwwroot/images/
 
 # Set environment variables for production
 ENV ASPNETCORE_ENVIRONMENT=Production

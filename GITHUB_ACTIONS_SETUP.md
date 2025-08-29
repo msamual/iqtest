@@ -85,10 +85,22 @@ sudo systemctl restart actions.runner.*
 sudo journalctl -u actions.runner.* -f
 ```
 
+### Docker permission denied
+```bash
+# Проверьте права на Docker socket
+ls -la /var/run/docker.sock
+
+# Добавьте пользователя в группу docker
+sudo usermod -aG docker $USER
+
+# Перезапустите runner после изменения групп
+sudo systemctl restart actions.runner.*
+```
+
 ### Docker образы не собираются
 ```bash
 # Проверьте Dockerfile
-docker build -t test ./IqTestApi -f ./IqTestApi/Dockerfile.prod
+sudo docker build -t test ./IqTestApi -f ./IqTestApi/Dockerfile.prod
 ```
 
 ### SSL сертификаты не найдены
