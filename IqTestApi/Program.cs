@@ -40,17 +40,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAngular");
 
-// Serve static files (images)
+// Serve static files (images) - must come before routing
 app.UseStaticFiles();
 
 // Serve static files from wwwroot with specific path mapping
+var wwwrootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+Console.WriteLine($"Serving static files from: {wwwrootPath}");
+Console.WriteLine($"Directory exists: {Directory.Exists(wwwrootPath)}");
+
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    FileProvider = new PhysicalFileProvider(wwwrootPath),
     RequestPath = "/images"
 });
 
+app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
 
