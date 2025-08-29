@@ -15,19 +15,19 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Test Docker Compose
-      run: sudo docker-compose config
+      run: docker-compose config
 
     - name: Test API Docker build
       run: |
-        sudo docker build -t iq-test-api:test ./IqTestApi -f ./IqTestApi/Dockerfile.prod
+        docker build -t iq-test-api:test ./IqTestApi -f ./IqTestApi/Dockerfile.prod
         echo "✅ API Docker build successful"
 
     - name: Test Frontend Docker build
       run: |
-        sudo docker build -t iq-test-frontend:test ./iq-test-frontend -f ./iq-test-frontend/Dockerfile.prod
+        docker build -t iq-test-frontend:test ./iq-test-frontend -f ./iq-test-frontend/Dockerfile.prod
         echo "✅ Frontend Docker build successful"
 
     - name: Cleanup test images
       run: |
-        sudo docker rmi iq-test-api:test || true
-        sudo docker rmi iq-test-frontend:test || true
+        docker rmi iq-test-api:test || true
+        docker rmi iq-test-frontend:test || true

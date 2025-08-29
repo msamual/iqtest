@@ -87,11 +87,18 @@ sudo journalctl -u actions.runner.* -f
 
 ### Docker permission denied
 ```bash
+# Запустите скрипт настройки прав (как root)
+sudo ./setup-runner-permissions.sh
+
+# Или вручную:
 # Проверьте права на Docker socket
 ls -la /var/run/docker.sock
 
-# Добавьте пользователя в группу docker
-sudo usermod -aG docker $USER
+# Добавьте пользователя runner в группу docker
+sudo usermod -aG docker runner
+
+# Установите права на Docker socket
+sudo chmod 666 /var/run/docker.sock
 
 # Перезапустите runner после изменения групп
 sudo systemctl restart actions.runner.*
@@ -108,4 +115,16 @@ sudo docker build -t test ./IqTestApi -f ./IqTestApi/Dockerfile.prod
 # Проверьте пути к сертификатам
 ls -la /etc/ssl/certs/msamual.ru.crt
 ls -la /etc/ssl/certs/Certificate.key
+```
+
+### Картинки не отображаются
+```bash
+# Запустите диагностику картинок
+./test-images-debug.sh
+
+# Проверьте, есть ли картинки в контейнере API
+docker-compose exec iq-test-api ls -la /app/wwwroot/images/
+
+# Проверьте конфигурацию Nginx
+docker-compose exec iq-test-frontend cat /etc/nginx/conf.d/default.conf
 ```
