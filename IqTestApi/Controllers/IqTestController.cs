@@ -21,11 +21,11 @@ namespace IqTestApi.Controllers
         }
 
         [HttpPost("start")]
-        public ActionResult<TestSession> StartTest()
+        public async Task<ActionResult<TestSession>> StartTest()
         {
             try
             {
-                var session = _iqTestService.CreateTestSession();
+                var session = await _iqTestService.CreateTestSessionAsync();
                 return Ok(session);
             }
             catch (Exception ex)
@@ -35,11 +35,11 @@ namespace IqTestApi.Controllers
         }
 
         [HttpGet("questions")]
-        public ActionResult<List<IqQuestionForClient>> GetQuestions([FromQuery] int count = 20)
+        public async Task<ActionResult<List<IqQuestionForClient>>> GetQuestions([FromQuery] int count = 20)
         {
             try
             {
-                var questions = _iqTestService.GetQuestions(count);
+                var questions = await _iqTestService.GetQuestionsAsync(count);
                 return Ok(questions);
             }
             catch (Exception ex)
@@ -49,16 +49,16 @@ namespace IqTestApi.Controllers
         }
 
         [HttpGet("questions/{id}")]
-        public ActionResult<IqQuestion> GetQuestion(int id)
+        public async Task<ActionResult<IqQuestion>> GetQuestion(int id)
         {
             try
             {
-                var question = _iqTestService.GetQuestionById(id);
+                var question = await _iqTestService.GetQuestionByIdAsync(id);
+                if (question == null)
+                {
+                    return NotFound(new { error = "Question not found" });
+                }
                 return Ok(question);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(new { error = ex.Message });
             }
             catch (Exception ex)
             {
@@ -67,11 +67,11 @@ namespace IqTestApi.Controllers
         }
 
         [HttpPost("submit-answer")]
-        public ActionResult<TestSession> SubmitAnswer([FromBody] SubmitAnswerRequest request)
+        public async Task<ActionResult<TestSession>> SubmitAnswer([FromBody] SubmitAnswerRequest request)
         {
             try
             {
-                var session = _iqTestService.SubmitAnswer(
+                var session = await _iqTestService.SubmitAnswerAsync(
                     request.SessionId, 
                     request.QuestionId, 
                     request.AnswerIndex, 
@@ -90,11 +90,11 @@ namespace IqTestApi.Controllers
         }
 
         [HttpPost("complete")]
-        public ActionResult<TestSession> CompleteTest([FromBody] CompleteTestRequest request)
+        public async Task<ActionResult<TestSession>> CompleteTest([FromBody] CompleteTestRequest request)
         {
             try
             {
-                var session = _iqTestService.CompleteTest(request.SessionId);
+                var session = await _iqTestService.CompleteTestAsync(request.SessionId);
                 return Ok(session);
             }
             catch (ArgumentException ex)
@@ -108,16 +108,16 @@ namespace IqTestApi.Controllers
         }
 
         [HttpGet("session/{sessionId}")]
-        public ActionResult<TestSession> GetSession(Guid sessionId)
+        public async Task<ActionResult<TestSession>> GetSession(Guid sessionId)
         {
             try
             {
-                var session = _iqTestService.GetTestSession(sessionId);
+                var session = await _iqTestService.GetTestSessionAsync(sessionId);
+                if (session == null)
+                {
+                    return NotFound(new { error = "Session not found" });
+                }
                 return Ok(session);
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(new { error = ex.Message });
             }
             catch (Exception ex)
             {

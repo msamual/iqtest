@@ -1,4 +1,6 @@
 using IqTestApi.Services;
+using IqTestApi.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+
+// Add Entity Framework
+var connectionStringName = builder.Environment.IsProduction() ? "ProductionConnection" : "DefaultConnection";
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString(connectionStringName)));
 
 // Register IQ Test Service
 builder.Services.AddScoped<IIqTestService, IqTestService>();
@@ -57,5 +64,37 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
+
+// Применяем миграции и заполняем данные при запуске
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    
+    try
+    {
+        logger.LogInformation("Applying database migrations...");
+        
+        // Применяем миграции
+        await context.Database.MigrateAsync();
+        
+        logger.LogInformation("Database migrations applied successfully.");
+        
+        // Заполняем начальные данные
+        logger.LogInformation("Seeding initial data...");
+        await IqTestApi.Data.DataSeeder.SeedDataAsync(context);
+        logger.LogInformation("Initial data seeded successfully.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+        
+        // В продакшене не останавливаем приложение из-за проблем с БД
+        if (app.Environment.IsDevelopment())
+        {
+            throw;
+        }
+    }
+}
 
 app.Run();

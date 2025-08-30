@@ -1,11 +1,21 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace IqTestApi.Models
 {
     public class TestSession
     {
+        [Key]
         public Guid Id { get; set; }
+        
+        [Required]
         public DateTime StartTime { get; set; }
+        
         public DateTime? EndTime { get; set; }
-        public List<QuestionAnswer> Answers { get; set; } = new List<QuestionAnswer>();
+        
+        // Навигационное свойство для ответов
+        public virtual ICollection<QuestionAnswer> Answers { get; set; } = new List<QuestionAnswer>();
+        
         public int TotalScore { get; set; }
         public int MaxPossibleScore { get; set; }
         public double IqScore { get; set; }
@@ -14,10 +24,34 @@ namespace IqTestApi.Models
 
     public class QuestionAnswer
     {
+        [Key]
+        public int Id { get; set; }
+        
+        [Required]
+        public Guid TestSessionId { get; set; }
+        
+        [Required]
         public int QuestionId { get; set; }
+        
+        [Required]
+        [Range(0, 10)]
         public int SelectedAnswerIndex { get; set; }
+        
+        [Required]
         public bool IsCorrect { get; set; }
+        
+        [Required]
+        [Range(0, 300)]
         public int TimeSpent { get; set; } // в секундах
+        
+        [Required]
         public DateTime AnsweredAt { get; set; }
+        
+        // Навигационные свойства
+        [ForeignKey("TestSessionId")]
+        public virtual TestSession TestSession { get; set; } = null!;
+        
+        [ForeignKey("QuestionId")]
+        public virtual IqQuestion Question { get; set; } = null!;
     }
 }

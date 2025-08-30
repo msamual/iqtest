@@ -1,16 +1,40 @@
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: iq-test-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: iqtestdb
+      POSTGRES_USER: iqtest
+      POSTGRES_PASSWORD: iqtest123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - iq-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iqtest -d iqtestdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # .NET API Backend
   iq-test-api:
     build:
       context: ./IqTestApi
       dockerfile: Dockerfile.prod
-    container_name: iq-test-api-prod
+    container_name: iq-test-api
     restart: unless-stopped
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
     networks:
       - iq-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80/api/IqTest/health"]
       interval: 30s
@@ -22,20 +46,22 @@ services:
     build:
       context: ./iq-test-frontend
       dockerfile: Dockerfile.prod
-    container_name: iq-test-frontend-prod
+    container_name: iq-test-frontend
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
+      # SSL certificates (optional - only exist on production server)
       - /etc/ssl/certs/msamual.ru.crt:/etc/ssl/certs/msamual.ru.crt:ro
       - /etc/ssl/certs/Certificate.key:/etc/ssl/certs/Certificate.key:ro
     depends_on:
-      - iq-test-api
+      iq-test-api:
+        condition: service_healthy
     networks:
       - iq-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "https://localhost"]
+      test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -43,3 +69,6 @@ services:
 networks:
   iq-network:
     driver: bridge
+
+volumes:
+  postgres_data:
