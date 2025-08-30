@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace IqTestApi.Models
 {
@@ -49,9 +50,11 @@ namespace IqTestApi.Models
         
         // Навигационные свойства
         [ForeignKey("TestSessionId")]
+        [JsonIgnore]
         public virtual TestSession TestSession { get; set; } = null!;
         
         [ForeignKey("QuestionId")]
+        [JsonIgnore]
         public virtual IqQuestion Question { get; set; } = null!;
     }
 }

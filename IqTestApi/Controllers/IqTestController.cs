@@ -21,12 +21,12 @@ namespace IqTestApi.Controllers
         }
 
         [HttpPost("start")]
-        public async Task<ActionResult<TestSession>> StartTest()
+        public async Task<ActionResult<TestSessionDto>> StartTest()
         {
             try
             {
                 var session = await _iqTestService.CreateTestSessionAsync();
-                return Ok(session);
+                return Ok(TestSessionDto.FromEntity(session));
             }
             catch (Exception ex)
             {
@@ -67,7 +67,7 @@ namespace IqTestApi.Controllers
         }
 
         [HttpPost("submit-answer")]
-        public async Task<ActionResult<TestSession>> SubmitAnswer([FromBody] SubmitAnswerRequest request)
+        public async Task<ActionResult<TestSessionDto>> SubmitAnswer([FromBody] SubmitAnswerRequest request)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace IqTestApi.Controllers
                     request.AnswerIndex, 
                     request.TimeSpent
                 );
-                return Ok(session);
+                return Ok(TestSessionDto.FromEntity(session));
             }
             catch (ArgumentException ex)
             {
@@ -90,12 +90,12 @@ namespace IqTestApi.Controllers
         }
 
         [HttpPost("complete")]
-        public async Task<ActionResult<TestSession>> CompleteTest([FromBody] CompleteTestRequest request)
+        public async Task<ActionResult<TestSessionDto>> CompleteTest([FromBody] CompleteTestRequest request)
         {
             try
             {
                 var session = await _iqTestService.CompleteTestAsync(request.SessionId);
-                return Ok(session);
+                return Ok(TestSessionDto.FromEntity(session));
             }
             catch (ArgumentException ex)
             {
@@ -108,7 +108,7 @@ namespace IqTestApi.Controllers
         }
 
         [HttpGet("session/{sessionId}")]
-        public async Task<ActionResult<TestSession>> GetSession(Guid sessionId)
+        public async Task<ActionResult<TestSessionDto>> GetSession(Guid sessionId)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace IqTestApi.Controllers
                 {
                     return NotFound(new { error = "Session not found" });
                 }
-                return Ok(session);
+                return Ok(TestSessionDto.FromEntity(session));
             }
             catch (Exception ex)
             {
