@@ -1,12 +1,10 @@
 # .NET
 bin/
 obj/
+publish/
 *.user
 *.suo
 *.cache
-*.dll
-*.pdb
-*.exe
 *.log
 
 # Node.js
@@ -14,15 +12,12 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-dist/
-.angular/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
@@ -33,18 +28,3 @@ Thumbs.db
 
 # Logs
 *.log
-logs/
-
-# Environment
-.env
-.env.local
-.env.production
-
-# SSL certificates (не коммитим сертификаты)
-*.crt
-*.key
-*.pem
-
-# Temporary files
-tmp/
-temp/

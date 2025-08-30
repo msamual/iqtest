@@ -1,6 +1,0 @@
-@IqTestApi_HostAddress = http://localhost:5263
-
-GET {{IqTestApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

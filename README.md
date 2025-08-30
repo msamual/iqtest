@@ -34,11 +34,6 @@ Full-stack IQ test application with Angular frontend and .NET Core API backend, 
 ./deploy.sh
 ```
 
-### Test
-```bash
-./test.sh
-```
-
 ## Access
 
 - **Application**: https://msamual.ru
