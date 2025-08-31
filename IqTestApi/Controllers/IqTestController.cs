@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using IqTestApi.Services;
 using IqTestApi.Models;
 
@@ -8,16 +9,39 @@ namespace IqTestApi.Controllers
     [Route("api/[controller]")]
     public class IqTestController : ControllerBase
     {
+        [HttpGet("my-tests")]
+        [Authorize]
+        public async Task<ActionResult<List<TestSessionDto>>> GetMyTests()
+        {
+            try
+            {
+                var userId = _authService.GetUserIdFromToken(User);
+                if (userId == null)
+                {
+                    return Unauthorized(new { error = "Недействительный токен" });
+                }
+
+                var sessions = await _iqTestService.GetUserTestSessionsAsync(userId.Value);
+                return Ok(sessions.Select(TestSessionDto.FromEntity).ToList());
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
         [HttpGet("health")]
         public IActionResult Health()
         {
             return Ok(new { status = "healthy", timestamp = DateTime.UtcNow });
         }
         private readonly IIqTestService _iqTestService;
+        private readonly AuthService _authService;
 
-        public IqTestController(IIqTestService iqTestService)
+        public IqTestController(IIqTestService iqTestService, AuthService authService)
         {
             _iqTestService = iqTestService;
+            _authService = authService;
         }
 
         [HttpPost("start")]
@@ -25,7 +49,14 @@ namespace IqTestApi.Controllers
         {
             try
             {
-                var session = await _iqTestService.CreateTestSessionAsync();
+                // Проверяем, авторизован ли пользователь (не обязательно)
+                Guid? userId = null;
+                if (User.Identity?.IsAuthenticated == true)
+                {
+                    userId = _authService.GetUserIdFromToken(User);
+                }
+
+                var session = await _iqTestService.CreateTestSessionAsync(userId);
                 return Ok(TestSessionDto.FromEntity(session));
             }
             catch (Exception ex)

@@ -14,7 +14,14 @@ namespace IqTestApi.Models
         
         public DateTime? EndTime { get; set; }
         
-        // Навигационное свойство для ответов
+        // Связь с пользователем
+        public Guid? UserId { get; set; }
+        
+        // Навигационные свойства
+        [ForeignKey("UserId")]
+        [JsonIgnore]
+        public virtual User? User { get; set; }
+        
         public virtual ICollection<QuestionAnswer> Answers { get; set; } = new List<QuestionAnswer>();
         
         public int TotalScore { get; set; }

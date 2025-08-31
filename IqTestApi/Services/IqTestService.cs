@@ -8,10 +8,11 @@ namespace IqTestApi.Services
     {
         Task<List<IqQuestionForClient>> GetQuestionsAsync(int count = 20);
         Task<IqQuestion?> GetQuestionByIdAsync(int id);
-        Task<TestSession> CreateTestSessionAsync();
+        Task<TestSession> CreateTestSessionAsync(Guid? userId = null);
         Task<TestSession> SubmitAnswerAsync(Guid sessionId, int questionId, int answerIndex, int timeSpent);
         Task<TestSession> CompleteTestAsync(Guid sessionId);
         Task<TestSession?> GetTestSessionAsync(Guid sessionId);
+        Task<List<TestSession>> GetUserTestSessionsAsync(Guid userId);
     }
 
     public class IqTestService : IIqTestService
@@ -55,13 +56,14 @@ namespace IqTestApi.Services
             return await _context.IqQuestions.FirstOrDefaultAsync(q => q.Id == id);
         }
 
-        public async Task<TestSession> CreateTestSessionAsync()
+        public async Task<TestSession> CreateTestSessionAsync(Guid? userId = null)
         {
             var session = new TestSession
             {
                 Id = Guid.NewGuid(),
                 StartTime = DateTime.UtcNow,
-                IsCompleted = false
+                IsCompleted = false,
+                UserId = userId
             };
 
             _context.TestSessions.Add(session);
@@ -153,6 +155,14 @@ namespace IqTestApi.Services
             return Math.Max(70.0, Math.Min(130.0, iqScore));
         }
 
-
+        public async Task<List<TestSession>> GetUserTestSessionsAsync(Guid userId)
+        {
+            return await _context.TestSessions
+                .Where(s => s.UserId == userId)
+                .Include(s => s.Answers)
+                    .ThenInclude(a => a.Question)
+                .OrderByDescending(s => s.StartTime)
+                .ToListAsync();
+        }
     }
 }

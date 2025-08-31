@@ -2,6 +2,9 @@ using IqTestApi.Services;
 using IqTestApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +18,32 @@ var connectionStringName = builder.Environment.IsProduction() ? "ProductionConne
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString(connectionStringName)));
 
-// Register IQ Test Service
+// Register services
 builder.Services.AddScoped<IIqTestService, IqTestService>();
+builder.Services.AddScoped<AuthService>();
+
+// Add JWT Authentication
+var jwtSecretKey = builder.Configuration["Jwt:SecretKey"] ?? "your-super-secret-key-for-jwt-tokens-must-be-at-least-32-characters-long";
+var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "IqTestApi";
+var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "IqTestApp";
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -62,7 +89,11 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.UseRouting();
+
+// Add authentication middleware
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 // Применяем миграции и заполняем данные при запуске
@@ -73,12 +104,12 @@ using (var scope = app.Services.CreateScope())
     
     try
     {
-        logger.LogInformation("Applying database migrations...");
+        logger.LogInformation("Ensuring database is created...");
         
-        // Применяем миграции
-        await context.Database.MigrateAsync();
+        // Создаем базу данных если её нет
+        await context.Database.EnsureCreatedAsync();
         
-        logger.LogInformation("Database migrations applied successfully.");
+        logger.LogInformation("Database created/verified successfully.");
         
         // Заполняем начальные данные
         logger.LogInformation("Seeding initial data...");
