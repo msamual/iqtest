@@ -14,7 +14,8 @@ docker-compose down
 **Доступные адреса:**
 - **Фронтенд локально:** `http://localhost`
 - **Фронтенд на сервере:** `https://msamual.ru`
-- **pgAdmin:** `http://localhost:8080`
+- **pgAdmin локально:** `http://localhost/pgadmin/`
+- **pgAdmin на сервере:** `https://msamual.ru/pgadmin/`
 
 ### Полезные команды
 ```bash
@@ -86,7 +87,8 @@ curl -X POST http://localhost:5263/api/IqTest/start
 pgAdmin предоставляет веб-интерфейс для управления PostgreSQL базой данных.
 
 ### Доступ к pgAdmin:
-- **URL**: http://localhost:8080
+- **URL локально**: http://localhost/pgadmin/
+- **URL на сервере**: https://msamual.ru/pgadmin/
 - **Email**: admin@iqtest.com
 - **Пароль**: admin123
 

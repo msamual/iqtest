@@ -19,9 +19,16 @@ server {
     gzip_min_length 1024;
     gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
 
-    # Handle Angular routing
-    location / {
-        try_files $uri $uri/ /index.html;
+    # pgAdmin proxy (must come before Angular routing)
+    location /pgadmin/ {
+        proxy_pass http://iq-test-pgadmin:80/;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Script-Name /pgadmin;
+        proxy_redirect off;
     }
 
     # API images proxy (must come before general API proxy)
@@ -51,6 +58,11 @@ server {
     location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
+    }
+
+    # Handle Angular routing (must be last)
+    location / {
+        try_files $uri $uri/ /index.html;
     }
 }
 EOF
