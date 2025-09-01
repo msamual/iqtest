@@ -104,12 +104,55 @@ using (var scope = app.Services.CreateScope())
     
     try
     {
-        logger.LogInformation("Ensuring database is created...");
+        logger.LogInformation("Ensuring database schema is up to date...");
         
-        // Создаем базу данных если её нет
+        // Проверяем, существует ли таблица Users
+        var usersTableExists = await context.Database.ExecuteSqlRawAsync(
+            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'Users')");
+        
+        if (usersTableExists == 0)
+        {
+            logger.LogInformation("Creating Users table...");
+            
+            // Создаем таблицу Users
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE TABLE ""Users"" (
+                    ""Id"" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    ""Username"" VARCHAR(50) NOT NULL UNIQUE,
+                    ""Email"" VARCHAR(100) NOT NULL UNIQUE,
+                    ""PasswordHash"" TEXT NOT NULL,
+                    ""CreatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                )");
+            
+            // Добавляем столбец UserId в TestSessions если его нет
+            await context.Database.ExecuteSqlRawAsync(@"
+                ALTER TABLE ""TestSessions"" ADD COLUMN IF NOT EXISTS ""UserId"" UUID");
+            
+            // Создаем внешний ключ
+            await context.Database.ExecuteSqlRawAsync(@"
+                ALTER TABLE ""TestSessions"" 
+                ADD CONSTRAINT ""FK_TestSessions_Users"" 
+                FOREIGN KEY (""UserId"") REFERENCES ""Users"" (""Id"") ON DELETE SET NULL");
+            
+            // Создаем индексы
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE INDEX ""IX_Users_Username"" ON ""Users"" (""Username"")");
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE INDEX ""IX_Users_Email"" ON ""Users"" (""Email"")");
+            await context.Database.ExecuteSqlRawAsync(@"
+                CREATE INDEX ""IX_TestSessions_UserId"" ON ""TestSessions"" (""UserId"")");
+            
+            logger.LogInformation("Users table and relationships created successfully.");
+        }
+        else
+        {
+            logger.LogInformation("Users table already exists.");
+        }
+        
+        // Создаем базу данных если её нет (для остальных таблиц)
         await context.Database.EnsureCreatedAsync();
         
-        logger.LogInformation("Database created/verified successfully.");
+        logger.LogInformation("Database schema verified successfully.");
         
         // Заполняем начальные данные
         logger.LogInformation("Seeding initial data...");
