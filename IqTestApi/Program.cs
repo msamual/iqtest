@@ -127,10 +127,14 @@ using (var scope = app.Services.CreateScope())
             await context.Database.ExecuteSqlRawAsync(@"
                 CREATE TABLE ""Users"" (
                     ""Id"" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-                    ""Username"" VARCHAR(50) NOT NULL UNIQUE,
-                    ""Email"" VARCHAR(100) NOT NULL UNIQUE,
+                    ""Username"" VARCHAR(100) NOT NULL UNIQUE,
+                    ""Email"" VARCHAR(255) NOT NULL UNIQUE,
                     ""PasswordHash"" TEXT NOT NULL,
-                    ""CreatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                    ""FirstName"" VARCHAR(100),
+                    ""LastName"" VARCHAR(100),
+                    ""CreatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                    ""LastLoginAt"" TIMESTAMP WITH TIME ZONE,
+                    ""IsActive"" BOOLEAN NOT NULL DEFAULT TRUE
                 )");
             
             // Добавляем столбец UserId в TestSessions если его нет
@@ -179,7 +183,25 @@ using (var scope = app.Services.CreateScope())
         }
         else
         {
-            logger.LogInformation("Users table already exists.");
+            logger.LogInformation("Users table already exists. Checking for missing columns...");
+            
+            // Добавляем недостающие столбцы если их нет
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    ALTER TABLE ""Users"" ADD COLUMN IF NOT EXISTS ""FirstName"" VARCHAR(100)");
+                await context.Database.ExecuteSqlRawAsync(@"
+                    ALTER TABLE ""Users"" ADD COLUMN IF NOT EXISTS ""LastName"" VARCHAR(100)");
+                await context.Database.ExecuteSqlRawAsync(@"
+                    ALTER TABLE ""Users"" ADD COLUMN IF NOT EXISTS ""LastLoginAt"" TIMESTAMP WITH TIME ZONE");
+                await context.Database.ExecuteSqlRawAsync(@"
+                    ALTER TABLE ""Users"" ADD COLUMN IF NOT EXISTS ""IsActive"" BOOLEAN DEFAULT TRUE");
+                logger.LogInformation("Added missing columns to Users table.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation($"Error adding columns to Users table: {ex.Message}");
+            }
         }
         
         // Создаем базу данных если её нет (для остальных таблиц)
