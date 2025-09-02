@@ -107,10 +107,19 @@ using (var scope = app.Services.CreateScope())
         logger.LogInformation("Ensuring database schema is up to date...");
         
         // Проверяем, существует ли таблица Users
-        var usersTableExists = await context.Database.ExecuteSqlRawAsync(
-            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'Users')");
+        bool usersTableExists = false;
+        try
+        {
+            await context.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"Users\" LIMIT 1");
+            usersTableExists = true;
+            logger.LogInformation("Users table exists.");
+        }
+        catch
+        {
+            logger.LogInformation("Users table does not exist, will create it.");
+        }
         
-        if (usersTableExists == 0)
+        if (!usersTableExists)
         {
             logger.LogInformation("Creating Users table...");
             
@@ -125,22 +134,46 @@ using (var scope = app.Services.CreateScope())
                 )");
             
             // Добавляем столбец UserId в TestSessions если его нет
-            await context.Database.ExecuteSqlRawAsync(@"
-                ALTER TABLE ""TestSessions"" ADD COLUMN IF NOT EXISTS ""UserId"" UUID");
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    ALTER TABLE ""TestSessions"" ADD COLUMN ""UserId"" UUID");
+                logger.LogInformation("Added UserId column to TestSessions.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation($"UserId column might already exist: {ex.Message}");
+            }
             
             // Создаем внешний ключ
-            await context.Database.ExecuteSqlRawAsync(@"
-                ALTER TABLE ""TestSessions"" 
-                ADD CONSTRAINT ""FK_TestSessions_Users"" 
-                FOREIGN KEY (""UserId"") REFERENCES ""Users"" (""Id"") ON DELETE SET NULL");
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    ALTER TABLE ""TestSessions"" 
+                    ADD CONSTRAINT ""FK_TestSessions_Users"" 
+                    FOREIGN KEY (""UserId"") REFERENCES ""Users"" (""Id"") ON DELETE SET NULL");
+                logger.LogInformation("Created foreign key constraint.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation($"Foreign key constraint might already exist: {ex.Message}");
+            }
             
             // Создаем индексы
-            await context.Database.ExecuteSqlRawAsync(@"
-                CREATE INDEX ""IX_Users_Username"" ON ""Users"" (""Username"")");
-            await context.Database.ExecuteSqlRawAsync(@"
-                CREATE INDEX ""IX_Users_Email"" ON ""Users"" (""Email"")");
-            await context.Database.ExecuteSqlRawAsync(@"
-                CREATE INDEX ""IX_TestSessions_UserId"" ON ""TestSessions"" (""UserId"")");
+            try
+            {
+                await context.Database.ExecuteSqlRawAsync(@"
+                    CREATE INDEX ""IX_Users_Username"" ON ""Users"" (""Username"")");
+                await context.Database.ExecuteSqlRawAsync(@"
+                    CREATE INDEX ""IX_Users_Email"" ON ""Users"" (""Email"")");
+                await context.Database.ExecuteSqlRawAsync(@"
+                    CREATE INDEX ""IX_TestSessions_UserId"" ON ""TestSessions"" (""UserId"")");
+                logger.LogInformation("Created indexes.");
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation($"Some indexes might already exist: {ex.Message}");
+            }
             
             logger.LogInformation("Users table and relationships created successfully.");
         }
