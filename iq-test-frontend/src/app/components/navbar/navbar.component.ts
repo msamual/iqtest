@@ -33,7 +33,7 @@ import { AuthService, User } from '../../services/auth.service';
               </a>
               
               <a *ngIf="currentUser" 
-                 routerLink="/results" 
+                 routerLink="/my-tests" 
                  routerLinkActive="border-indigo-500 text-gray-900"
                  class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                 Мои результаты
@@ -73,7 +73,7 @@ import { AuthService, User } from '../../services/auth.service';
                       Профиль
                     </a>
                     
-                    <a routerLink="/results" 
+                    <a routerLink="/my-tests" 
                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                        (click)="closeUserMenu()">
                       Мои результаты
@@ -122,7 +122,7 @@ import { AuthService, User } from '../../services/auth.service';
               Пройти тест
             </a>
             
-            <a routerLink="/results" 
+            <a routerLink="/my-tests" 
                routerLinkActive="bg-indigo-50 border-indigo-500 text-indigo-700"
                class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium">
               Мои результаты

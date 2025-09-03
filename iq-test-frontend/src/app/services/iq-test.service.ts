@@ -88,6 +88,12 @@ export class IqTestService {
     );
   }
 
+  getMyTests(): Observable<TestSession[]> {
+    return this.http.get<TestSession[]>(`${this.apiUrl}/my-tests`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   getImageUrl(imagePath: string): string {
     if (!imagePath) return '';
     return `${this.baseUrl}${imagePath}`;
